@@ -1,58 +1,78 @@
-const express = require('express');
-const bodyParser = require('body-parser'); //Parse incoming request bodies in a middleware before your handlers, available under the req.body property.
-const multer = require('multer'); //Multer adds a body object and a file object to the request object. The body object contains the values of the text fields of the form, the file object contains the files uploaded via the form.
-const upload = multer({ dest: './uploads/' });
-const logger = require('morgan');
-const path = require('path');
-const fs = require('fs');
-const directoryPath = path.join(__dirname, '/uploads'); // join the path to the current directory
-const port = 4000; // Define port for app to listen on
-const app =  express();
-const sequelize = require('sequelize');
-app.use(logger('dev'));  // Creating a logger (using morgan)
-app.use(bodyParser());  // to use bodyParser (for data transfer between client and server)
-app.use(express.static('.'));  // making current directory as a static directory
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+const express = require('express')
+const app = express()
+const port = 8080
+const multer  = require('multer')
+const upload = multer({ dest: __dirname+'/uploads' })
+const fs = require('fs')
+const path = require('path')
+const dirPath = path.join(__dirname, "/uploads")
 
-app.get('/', (req, res) => {    // GET / route for serving index.html file
+// const express = require('express');
+//const router = express.Router();
+// const multer = require('multer');
+//const inMemoryStorage = multer.memoryStorage();
+//const uploadStrategy = multer({ storage: inMemoryStorage }).single('image');
+//const getStream = require('into-stream');
+//const containerName = 'images';
+//const ONE_MEGABYTE = 1024 * 1024;
+//const uploadOptions = { bufferSize: 4 * ONE_MEGABYTE, maxBuffers: 20 };
+//const ONE_MINUTE = 60 * 1000;
+
+//const sharedKeyCredential = new SharedKeyCredential(
+ //'coolguyaccountss',
+ //'RCdrK9QQ43nJMSWAOi/U6n1bJpOgtcPVi9pzipabddU8mwWvteLzUu9Gk5Z6NT3nP3UBT6xQFT2aoJbkQJ6TUA==');
+//const pipeline = StorageURL.newPipeline(sharedKeyCredential);
+//const serviceURL = new ServiceURL(
+ //`https://coolguyaccountss.blob.core.windows.net`,
+ //pipeline
+//);
+
+//const getBlobName = originalName => {
+ // Use a random number to generate a unique file name,
+ // removing "0." from the start of the string.
+ //const identifier = Math.random().toString().replace(/0\./, '');
+ //return `${identifier}-${originalName}`;
+//};
+
+app.post('/upload', uploadStrategy, async (req, res) => {
+  // const aborter = Aborter.timeout(30 * ONE_MINUTE);
+   //const blobName = getBlobName(req.file.originalname);
+   const stream = getStream(req.file.buffer);
+  // const containerURL = ContainerURL.fromServiceURL(serviceURL, containerName);
+   //const blockBlobURL = BlockBlobURL.fromContainerURL(containerURL, blobName);
+
+
+   //try {
+      // await uploadStreamToBlockBlob(aborter, stream,
+          // blockBlobURL, uploadOptions.bufferSize, uploadOptions.maxBuffers);
+          // res.redirect("/")
+
+      // } catch (err) {
+           //res.json(err)
+
+// }
+//});
+   app.get('/', (req, res) => {    // GET / route for serving index.html file
    res.render('index.html');
 });
 
+//app.post('/profile', upload.single('avatar'), function (req, res) {
+    //res.redirect("/")
+//})
+
 app.get('/images', (req, res) => {
-   fs.readdir(directoryPath, (err, files) => {
-       if (err) {
-         return res.json([]);
+   fs.readdir(dirPath, (err, files) => {
+       if(err) {
+           res.send("you suck")
+       } else {
+           res.json(files)
        }
-       return res.json(files);
-     });
-});
+   })
+})
 
+app.use(express.static('.'));
 
-app.post('/upload', upload.single('myFile'), (req, res) => {  // POST /upload for single file upload
-
-
-   res.redirect('/')   // Redirecting back to the home local host:4000/
-
-});
-
-app.listen(port, () => {   // To make the server live
-   console.log(`App is live on port ${port}`);
-});
-
-
-const psql = new sequelize('servername', 'useradmin', 'password', {
-   host: 'maypsql.postgres.database.azure.com',
-   dialect: 'postgres',
-   dialectOptions: {
-     ssl: true,
-     options: {
-       encrypt: true,
-   }
-  }
-  });
-
-
+app.listen(port, () => console.log(`Example app listening on port ${port}!`))
 
 
 
