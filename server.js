@@ -68,11 +68,11 @@ app.get('/images', (req, res) => {
            res.json(files)
        }
    })
-})
+});
 
 app.use(express.static('.'));
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 
 
